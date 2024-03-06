@@ -1,0 +1,7 @@
+[
+    {
+        "source": "/json",
+        "destination": "/json-dest",
+        "is_permanent": true
+    }
+]

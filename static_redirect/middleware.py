@@ -4,6 +4,9 @@ from django.shortcuts import redirect
 from urllib.parse import urlparse
 from typing import NamedTuple
 from django.forms.fields import BooleanField
+from pathlib import Path
+import json
+from django.core.exceptions import MiddlewareNotUsed
 
 class RedirectDestination(NamedTuple):
     destination: str
@@ -14,15 +17,27 @@ class StaticRedirectMiddleware:
         self.get_response = get_response
 
         self.data = {}
-        for file in settings.STATIC_REDIRECT_FILES:
-            with open(file, 'r') as f:
-                for row in csv.reader(f):
-                    try:
-                        is_permanent = BooleanField().to_python(row[2])
-                    except IndexError:
-                        is_permanent = False
 
-                    self.data[row[0]] = RedirectDestination(row[1], is_permanent)
+        for file in settings.STATIC_REDIRECT_FILES:
+            if not isinstance(file, Path):
+                file = Path(file)
+
+            with file.open(mode="r") as f:
+                if file.suffix == ".csv":
+                    for row in csv.reader(f):
+                        try:
+                            is_permanent = BooleanField().to_python(row[2])
+                        except IndexError:
+                            is_permanent = False
+
+                        self.data[row[0]] = RedirectDestination(row[1], is_permanent)
+
+                elif file.suffix == ".json":
+                    for entry in json.load(f):
+                        self.data[entry["source"]] = RedirectDestination(entry["destination"], entry.get("is_permanent", False))
+
+        if not self.data:
+            raise MiddlewareNotUsed()
 
     def __call__(self, request):
         path = request.get_full_path()
