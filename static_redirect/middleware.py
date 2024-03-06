@@ -17,6 +17,9 @@ class StaticRedirectMiddleware:
 
         self.data = {}
 
+        # HACK: Use this to cast to booleans
+        boolean_field = BooleanField()
+
         for file in settings.STATIC_REDIRECT_FILES:
             if not isinstance(file, Path):
                 file = Path(file)
@@ -25,7 +28,7 @@ class StaticRedirectMiddleware:
                 if file.suffix == ".csv":
                     for row in csv.reader(f):
                         try:
-                            is_permanent = BooleanField().to_python(row[2])
+                            is_permanent = boolean_field.to_python(row[2])
                         except IndexError:
                             is_permanent = False
 
