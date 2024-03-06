@@ -1,7 +1,6 @@
 from django.conf import settings
 import csv
 from django.shortcuts import redirect
-from urllib.parse import urlparse
 from typing import NamedTuple
 from django.forms.fields import BooleanField
 from pathlib import Path
@@ -40,12 +39,10 @@ class StaticRedirectMiddleware:
             raise MiddlewareNotUsed()
 
     def __call__(self, request):
-        path = request.get_full_path()
-
-        if destination := self.data.get(path):
+        if destination := self.data.get(request.get_full_path()):
             return redirect(destination.destination, permanent=destination.is_permanent)
 
-        elif destination := self.data.get(urlparse(path).path):
+        elif destination := self.data.get(request.path):
             return redirect(destination.destination, permanent=destination.is_permanent)
 
         return self.get_response(request)
