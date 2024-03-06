@@ -6,11 +6,50 @@ from django.forms.fields import BooleanField
 from pathlib import Path
 import json
 from django.core.exceptions import MiddlewareNotUsed
+from urllib.parse import urlparse
 
 
 class RedirectDestination(NamedTuple):
     destination: str
     is_permanent: bool
+
+
+def normalise_path(url):
+    """
+    Borrowed from `wagtail.contrib.redirects`.
+    """
+    # Strip whitespace
+    url = url.strip()
+
+    # Parse url
+    url_parsed = urlparse(url)
+
+    # Path must start with / but not end with /
+    path = url_parsed[2]
+    if not path.startswith("/"):
+        path = "/" + path
+
+    if path.endswith("/") and len(path) > 1:
+        path = path[:-1]
+
+    # Parameters must be sorted alphabetically
+    parameters = url_parsed[3]
+    parameters_components = parameters.split(";")
+    parameters = ";".join(sorted(parameters_components))
+
+    # Query string components must be sorted alphabetically
+    query_string = url_parsed[4]
+    query_string_components = query_string.split("&")
+    query_string = "&".join(sorted(query_string_components))
+
+    if parameters:
+        path = path + ";" + parameters
+
+    # Add query string to path
+    if query_string:
+        path = path + "?" + query_string
+
+    return path
 
 
 class StaticRedirectMiddleware:
@@ -34,24 +73,31 @@ class StaticRedirectMiddleware:
                         except IndexError:
                             is_permanent = False
 
-                        self.data[row[0]] = RedirectDestination(row[1], is_permanent)
+                        self.data[normalise_path(row[0])] = RedirectDestination(
+                            row[1], is_permanent
+                        )
 
                 elif file.suffix == ".json":
                     for entry in json.load(f):
-                        self.data[entry["source"]] = RedirectDestination(
-                            entry["destination"], entry.get("is_permanent", False)
+                        self.data[normalise_path(entry["source"])] = (
+                            RedirectDestination(
+                                entry["destination"], entry.get("is_permanent", False)
+                            )
                         )
 
         if not self.data:
             raise MiddlewareNotUsed()
 
     def __call__(self, request):
-        full_path = request.get_full_path()
+        path = normalise_path(request.get_full_path())
 
-        if destination := self.data.get(full_path):
+        if destination := self.data.get(path):
             return redirect(destination.destination, permanent=destination.is_permanent)
 
-        elif full_path != request.path and (destination := self.data.get(request.path)):
+        path_without_query = urlparse(path).path
+        if path != path_without_query and (
+            destination := self.data.get(path_without_query)
+        ):
             return redirect(destination.destination, permanent=destination.is_permanent)
 
         return self.get_response(request)
