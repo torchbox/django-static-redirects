@@ -46,10 +46,12 @@ class StaticRedirectMiddleware:
             raise MiddlewareNotUsed()
 
     def __call__(self, request):
-        if destination := self.data.get(request.get_full_path()):
+        full_path = request.get_full_path()
+
+        if destination := self.data.get(full_path):
             return redirect(destination.destination, permanent=destination.is_permanent)
 
-        elif destination := self.data.get(request.path):
+        elif full_path != request.path and (destination := self.data.get(request.path)):
             return redirect(destination.destination, permanent=destination.is_permanent)
 
         return self.get_response(request)
