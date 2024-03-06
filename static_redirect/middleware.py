@@ -7,9 +7,11 @@ from pathlib import Path
 import json
 from django.core.exceptions import MiddlewareNotUsed
 
+
 class RedirectDestination(NamedTuple):
     destination: str
     is_permanent: bool
+
 
 class StaticRedirectMiddleware:
     def __init__(self, get_response):
@@ -36,7 +38,9 @@ class StaticRedirectMiddleware:
 
                 elif file.suffix == ".json":
                     for entry in json.load(f):
-                        self.data[entry["source"]] = RedirectDestination(entry["destination"], entry.get("is_permanent", False))
+                        self.data[entry["source"]] = RedirectDestination(
+                            entry["destination"], entry.get("is_permanent", False)
+                        )
 
         if not self.data:
             raise MiddlewareNotUsed()

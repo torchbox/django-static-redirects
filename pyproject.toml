@@ -16,3 +16,9 @@ dependencies = [
 
 [tool.flit.module]
 name = "static_redirect"
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "black",
+]

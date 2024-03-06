@@ -12,11 +12,15 @@ class RedirectsMiddlewareTestCase(SimpleTestCase):
 
     def test_permanent_redirect(self):
         response = self.client.get("/foo-permanent")
-        self.assertRedirects(response, "/bar", status_code=301, fetch_redirect_response=False)
+        self.assertRedirects(
+            response, "/bar", status_code=301, fetch_redirect_response=False
+        )
 
     def test_redirect_from_json(self):
         response = self.client.get("/json")
-        self.assertRedirects(response, "/json-dest", status_code=301, fetch_redirect_response=False)
+        self.assertRedirects(
+            response, "/json-dest", status_code=301, fetch_redirect_response=False
+        )
 
     @override_settings(STATIC_REDIRECT_FILES=[])
     def test_no_files(self):

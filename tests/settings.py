@@ -15,5 +15,5 @@ ROOT_URLCONF = "tests.urls"
 
 STATIC_REDIRECT_FILES = [
     os.path.join(BASE_DIR, "tests/redirects/redirects.csv"),
-    os.path.join(BASE_DIR, "tests/redirects/redirects.json")
+    os.path.join(BASE_DIR, "tests/redirects/redirects.json"),
 ]
