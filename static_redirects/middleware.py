@@ -1,12 +1,13 @@
-from django.conf import settings
 import csv
-from django.shortcuts import redirect
-from typing import NamedTuple
-from django.forms.fields import BooleanField
-from pathlib import Path
 import json
-from django.core.exceptions import MiddlewareNotUsed
+from pathlib import Path
+from typing import NamedTuple
 from urllib.parse import urlparse
+
+from django.conf import settings
+from django.core.exceptions import MiddlewareNotUsed
+from django.forms.fields import BooleanField
+from django.shortcuts import redirect
 
 
 class RedirectDestination(NamedTuple):
@@ -52,7 +53,7 @@ def normalise_path(url):
     return path
 
 
-class StaticRedirectMiddleware:
+class StaticRedirectsMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -61,7 +62,7 @@ class StaticRedirectMiddleware:
         # HACK: Use this to cast to booleans
         boolean_field = BooleanField()
 
-        for file in settings.STATIC_REDIRECT_FILES:
+        for file in settings.STATIC_REDIRECTS:
             if not isinstance(file, Path):
                 file = Path(file)
 

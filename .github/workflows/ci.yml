@@ -40,9 +40,9 @@ jobs:
       - name: Run tests
         run: ./manage.py test
       - name: Format
-        run: black --check static_redirect tests
+        run: black --check static_redirects tests
       - name: Lint
-        run: ruff check static_redirect tests
+        run: ruff check static_redirects tests
 
   package:
     permissions:

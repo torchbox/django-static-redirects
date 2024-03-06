@@ -22,7 +22,7 @@ class RedirectsMiddlewareTestCase(SimpleTestCase):
             response, "/json-dest", status_code=301, fetch_redirect_response=False
         )
 
-    @override_settings(STATIC_REDIRECT_FILES=[])
+    @override_settings(STATIC_REDIRECTS=[])
     def test_no_files(self):
         response = self.client.get("/foo")
         self.assertEqual(response.status_code, 404)
