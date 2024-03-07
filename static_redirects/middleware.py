@@ -5,7 +5,7 @@ from typing import NamedTuple
 from urllib.parse import urlparse
 
 from django.conf import settings
-from django.core.exceptions import MiddlewareNotUsed
+from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.forms.fields import BooleanField
 from django.shortcuts import redirect
 
@@ -85,6 +85,8 @@ class StaticRedirectsMiddleware:
                                 entry["destination"], entry.get("is_permanent", False)
                             )
                         )
+                else:
+                    raise ImproperlyConfigured(f"Unknown file format: {file}")
 
         if not self.data:
             raise MiddlewareNotUsed()
