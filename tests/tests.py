@@ -1,6 +1,10 @@
+import os
+from io import StringIO
 from pathlib import Path
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.core.management import call_command
 from django.test import SimpleTestCase, override_settings
 
 
@@ -34,3 +38,27 @@ class RedirectsMiddlewareTestCase(SimpleTestCase):
         with override_settings(STATIC_REDIRECTS=[Path(__file__)]):
             with self.assertRaises(ImproperlyConfigured):
                 self.client.get("/foo")
+
+
+class DuplicateRedirectsCheckTestCase(SimpleTestCase):
+    def run_checks(self):
+        stdout = StringIO()
+        stderr = StringIO()
+        call_command("check", "-t", "files", stdout=stdout, stderr=stderr)
+        return stdout.getvalue(), stderr.getvalue()
+
+    def test_passes_by_default(self):
+        stdout, stderr = self.run_checks()
+        self.assertNotIn("static_redirects.W001", stderr)
+        self.assertNotIn("static_redirects.W001", stdout)
+
+    @override_settings(
+        STATIC_REDIRECTS=[
+            os.path.join(settings.BASE_DIR, "tests/redirects/redirects.csv"),
+            os.path.join(settings.BASE_DIR, "tests/redirects/redirects.csv"),
+        ]
+    )
+    def test_reports_duplicates(self):
+        stdout, stderr = self.run_checks()
+        self.assertIn("static_redirects.W001", stderr)
+        self.assertIn("/foo", stderr)
