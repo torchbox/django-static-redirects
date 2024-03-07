@@ -70,6 +70,11 @@ def normalise_path(url):
 
 
 def str_to_bool(value):
+    """
+    Convert a string to a boolean.
+
+    Copied from `django.forms.fields.BooleanField.to_python`.
+    """
     if isinstance(value, str) and value.lower() in ("false", "0"):
         return False
     return bool(value)
