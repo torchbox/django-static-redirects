@@ -62,7 +62,7 @@ class StaticRedirectsMiddleware:
         # HACK: Use this to cast to booleans
         boolean_field = BooleanField()
 
-        for file in settings.STATIC_REDIRECTS:
+        for file in getattr(settings, "STATIC_REDIRECTS", []):
             if not isinstance(file, Path):
                 file = Path(file)
 
