@@ -1,12 +1,12 @@
 from collections import Counter
 
-from django.core.checks import Tags, Warning, register
+from django.core.checks import Warning, register
 from django.utils.text import get_text_list
 
 from .utils import get_redirects
 
 
-@register(Tags.files)
+@register("files")
 def duplicate_redirects_check(app_configs, **kwargs):
     redirect_sources = []
 
