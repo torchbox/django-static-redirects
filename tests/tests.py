@@ -89,6 +89,12 @@ class RedirectsMiddlewareTestCase(SimpleTestCase):
             response, "/barfoo", status_code=302, fetch_redirect_response=False
         )
 
+    def test_redirect_with_querystring(self):
+        response = self.client.get("/foo?bar=baz")
+        self.assertRedirects(
+            response, "/barbaz", status_code=302, fetch_redirect_response=False
+        )
+
     @override_settings(STATIC_REDIRECTS=[])
     def test_no_files(self):
         response = self.client.get("/foo")

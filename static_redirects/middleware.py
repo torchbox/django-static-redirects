@@ -18,10 +18,19 @@ class StaticRedirectsMiddleware:
 
         self.data = {}
 
+        self.has_hostname_matching = False
+        self.has_querystring_matching = False
+
         for redirect in get_redirects():
             self.data[redirect.source] = RedirectDestination(
                 redirect.destination, redirect.is_permanent
             )
+
+            if not redirect.source.startswith("/"):
+                self.has_hostname_matching = True
+
+            if "?" in redirect.source:
+                self.has_querystring_matching = True
 
         if not self.data:
             raise MiddlewareNotUsed()
@@ -34,23 +43,28 @@ class StaticRedirectsMiddleware:
                 destination.destination, permanent=destination.is_permanent
             )
 
-        path_without_query = urlparse(path).path
-        if path != path_without_query and (
-            destination := self.data.get(path_without_query)
-        ):
-            return redirect_response(
-                destination.destination, permanent=destination.is_permanent
-            )
+        if self.has_querystring_matching:
+            path_without_query = urlparse(path).path
+            if path != path_without_query and (
+                destination := self.data.get(path_without_query)
+            ):
+                return redirect_response(
+                    destination.destination, permanent=destination.is_permanent
+                )
 
-        host = request.get_host()
-        if destination := self.data.get(host + path):
-            return redirect_response(
-                destination.destination, permanent=destination.is_permanent
-            )
+        if self.has_hostname_matching:
+            host = request.get_host()
 
-        if destination := self.data.get(host + path_without_query):
-            return redirect_response(
-                destination.destination, permanent=destination.is_permanent
-            )
+            if destination := self.data.get(host + path):
+                return redirect_response(
+                    destination.destination, permanent=destination.is_permanent
+                )
+
+            if self.has_querystring_matching and (
+                destination := self.data.get(host + path_without_query)
+            ):
+                return redirect_response(
+                    destination.destination, permanent=destination.is_permanent
+                )
 
         return self.get_response(request)
