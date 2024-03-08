@@ -1,2 +1,3 @@
 /foo,/bar
 /foo-permanent,/bar,true
+https://example.com/foobar,/barfoo

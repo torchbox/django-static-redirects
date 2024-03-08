@@ -42,4 +42,15 @@ class StaticRedirectsMiddleware:
                 destination.destination, permanent=destination.is_permanent
             )
 
+        host = request.get_host()
+        if destination := self.data.get(host + path):
+            return redirect_response(
+                destination.destination, permanent=destination.is_permanent
+            )
+
+        if destination := self.data.get(host + path_without_query):
+            return redirect_response(
+                destination.destination, permanent=destination.is_permanent
+            )
+
         return self.get_response(request)

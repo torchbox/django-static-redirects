@@ -31,6 +31,64 @@ class RedirectsMiddlewareTestCase(SimpleTestCase):
             response, "/json-dest", status_code=301, fetch_redirect_response=False
         )
 
+    def test_redirect_with_hostname_from_json(self):
+        response = self.client.get("/example-only", HTTP_HOST="example.com")
+        self.assertRedirects(
+            response, "/example-dest", status_code=301, fetch_redirect_response=False
+        )
+
+    def test_redirect_with_wrong_hostname_from_json(self):
+        response = self.client.get("/example-only")
+        self.assertEqual(response.status_code, 404)
+
+    def test_qualified_redirect_with_wrong_hostname_from_json(self):
+        response = self.client.get("/example-only-qualified")
+        self.assertEqual(response.status_code, 404)
+
+    def test_redirect_with_hostname_and_query_from_json(self):
+        response = self.client.get(
+            "/example-only?something=else", HTTP_HOST="example.com"
+        )
+        self.assertRedirects(
+            response, "/example-dest", status_code=301, fetch_redirect_response=False
+        )
+
+    def test_qualified_redirect_with_hostname_from_json(self):
+        response = self.client.get("/example-only-qualified", HTTP_HOST="example.com")
+        self.assertRedirects(
+            response,
+            "/example-qualified-dest",
+            status_code=301,
+            fetch_redirect_response=False,
+        )
+
+    def test_qualified_redirect_with_hostname_and_query_from_json(self):
+        response = self.client.get(
+            "/example-only-qualified?something=else", HTTP_HOST="example.com"
+        )
+        self.assertRedirects(
+            response,
+            "/example-qualified-dest",
+            status_code=301,
+            fetch_redirect_response=False,
+        )
+
+    def test_redirect_with_hostname(self):
+        response = self.client.get("/foobar", HTTP_HOST="example.com")
+        self.assertRedirects(
+            response, "/barfoo", status_code=302, fetch_redirect_response=False
+        )
+
+    def test_redirect_with_wrong_hostname(self):
+        response = self.client.get("/foobar")
+        self.assertEqual(response.status_code, 404)
+
+    def test_redirect_with_hostname_and_query(self):
+        response = self.client.get("/foobar?something=else", HTTP_HOST="example.com")
+        self.assertRedirects(
+            response, "/barfoo", status_code=302, fetch_redirect_response=False
+        )
+
     @override_settings(STATIC_REDIRECTS=[])
     def test_no_files(self):
         response = self.client.get("/foo")

@@ -17,3 +17,5 @@ STATIC_REDIRECTS = [
     os.path.join(BASE_DIR, "tests/redirects/redirects.csv"),
     os.path.join(BASE_DIR, "tests/redirects/redirects.json"),
 ]
+
+ALLOWED_HOSTS = ["*"]

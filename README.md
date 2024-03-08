@@ -31,6 +31,8 @@ STATIC_REDIRECTS = [
 
 Redirect files are read in-order, with latter redirects taking precedence.
 
+Redirects can either be just paths, in which case they match all hostnames, or include a hostname. Schemes are not included as part of the match. If a request contains a querystring, it is ignored, unless a match containing the querystring is found.
+
 ### CSV files
 
 CSV files must contain 2 or 3 columns, without a header. The first column is the source path, second is the destination URL, and the (optional) third notes whether the redirect is permanent.
@@ -38,6 +40,7 @@ CSV files must contain 2 or 3 columns, without a header. The first column is the
 ```csv
 /source,/destination,true
 /source2,/destination2
+https://example.com/source3,/destination3
 ```
 
 ### JSON files
@@ -54,6 +57,15 @@ JSON files must contain a list of objects:
     {
         "source": "/source2",
         "destination": "/destination2",
+    },
+    {
+        "source": "/source3",
+        "destination": "/destination3",
+        "hostname": "example.com"
+    },
+    {
+        "source": "https://example.com/source4",
+        "destination": "/destination4",
     }
 ]
 ```

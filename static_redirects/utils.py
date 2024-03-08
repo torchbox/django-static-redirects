@@ -93,12 +93,26 @@ def get_redirects():
                     except IndexError:
                         is_permanent = False
 
-                    yield Redirect(normalise_path(row[0]), row[1], is_permanent)
+                    source = row[0]
+                    if source.startswith("/"):
+                        source = normalise_path(source)
+                    else:
+                        parsed_source = urlparse(source)
+                        source = parsed_source.hostname + normalise_path(source)
+
+                    yield Redirect(source, row[1], is_permanent)
 
             elif file.suffix == ".json":
                 for entry in json.load(f):
+                    source = entry["source"]
+                    if source.startswith("/"):
+                        source = entry.get("hostname", "") + normalise_path(source)
+                    else:
+                        parsed_source = urlparse(source)
+                        source = parsed_source.hostname + normalise_path(source)
+
                     yield Redirect(
-                        normalise_path(entry["source"]),
+                        source,
                         entry["destination"],
                         entry.get("is_permanent", False),
                     )

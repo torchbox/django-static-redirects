@@ -3,5 +3,16 @@
         "source": "/json",
         "destination": "/json-dest",
         "is_permanent": true
+    },
+    {
+        "source": "/example-only",
+        "destination": "/example-dest",
+        "is_permanent": true,
+        "hostname": "example.com"
+    },
+    {
+        "source": "https://example.com/example-only-qualified",
+        "destination": "/example-qualified-dest",
+        "is_permanent": true
     }
 ]
