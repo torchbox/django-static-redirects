@@ -1,11 +1,13 @@
 import os
 from io import StringIO
 from pathlib import Path
+from unittest.mock import MagicMock
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import SimpleTestCase, override_settings
+from django.utils.autoreload import get_reloader
 
 from static_redirects.utils import get_redirect_files, normalise_path, str_to_bool
 
@@ -280,3 +282,17 @@ class StrToBoolTestCase(SimpleTestCase):
         self.assertFalse(str_to_bool("false"))
         self.assertFalse(str_to_bool("False"))
         self.assertFalse(str_to_bool("0"))
+
+
+class AutoReloadTestCase(SimpleTestCase):
+    def test_redirects_watched(self):
+        # HACK: Get a populated reloader
+        reloader = get_reloader()
+        reloader.stop()
+        reloader.run(MagicMock())
+
+        watched_files = list(reloader.watched_files())
+
+        for redirect_file in get_redirect_files():
+            with self.subTest(redirect_file):
+                self.assertIn(redirect_file, watched_files)

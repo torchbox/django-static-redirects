@@ -5,4 +5,4 @@ class StaticRedirectsAppConfig(AppConfig):
     name = "static_redirects"
 
     def ready(self):
-        from . import checks  # noqa
+        from . import checks, signal_handlers  # noqa:F401
