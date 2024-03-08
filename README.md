@@ -1,6 +1,6 @@
 # Django Static Redirects
 
-![CI](https://github.com/RealOrangeOne/django-static-redirects/workflows/CI/badge.svg)
+![CI](https://github.com/torchbox/django-static-redirects/workflows/CI/badge.svg)
 ![PyPI](https://img.shields.io/pypi/v/django-static-redirects.svg)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-static-redirects.svg)
 ![PyPI - License](https://img.shields.io/pypi/l/django-static-redirects.svg)

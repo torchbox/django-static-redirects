@@ -34,9 +34,9 @@ dependencies = [
 ]
 
 [project.urls]
-Source = "https://github.com/RealOrangeOne/django-static-redirects"
-Issues = "https://github.com/RealOrangeOne/django-static-redirects/issues"
-Changelog = "https://github.com/RealOrangeOne/django-static-redirects/releases"
+Source = "https://github.com/torchbox/django-static-redirects"
+Issues = "https://github.com/torchbox/django-static-redirects/issues"
+Changelog = "https://github.com/torchbox/django-static-redirects/releases"
 
 [tool.flit.module]
 name = "static_redirects"
