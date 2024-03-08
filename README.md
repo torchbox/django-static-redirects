@@ -26,6 +26,7 @@ To add files containing redirects, set them in `STATIC_REDIRECTS`:
 ```python
 STATIC_REDIRECTS = [
     BASE_DIR / "static-redirect.csv",
+    BASE_DIR / "static-redirect.json",
 ]
 ```
 
