@@ -1,15 +1,9 @@
-from typing import NamedTuple
 from urllib.parse import urlparse
 
 from django.core.exceptions import MiddlewareNotUsed
 from django.shortcuts import redirect as redirect_response
 
 from .utils import get_redirects, normalise_path
-
-
-class RedirectDestination(NamedTuple):
-    destination: str
-    is_permanent: bool
 
 
 class StaticRedirectsMiddleware:
@@ -22,9 +16,7 @@ class StaticRedirectsMiddleware:
         self.has_querystring_matching = False
 
         for redirect in get_redirects():
-            self.data[redirect.source] = RedirectDestination(
-                redirect.destination, redirect.is_permanent
-            )
+            self.data[redirect.source] = redirect
 
             if not redirect.source.startswith("/"):
                 self.has_hostname_matching = True
