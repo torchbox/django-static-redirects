@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from django.core.exceptions import MiddlewareNotUsed
 from django.shortcuts import redirect as redirect_response
@@ -36,7 +36,7 @@ class StaticRedirectsMiddleware:
             )
 
         if self.has_querystring_matching:
-            path_without_query = urlparse(path).path
+            path_without_query = urlsplit(path).path
             if path != path_without_query and (
                 destination := self.data.get(path_without_query)
             ):

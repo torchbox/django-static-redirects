@@ -136,65 +136,55 @@ class DuplicateRedirectsCheckTestCase(SimpleTestCase):
 
 class NormalisePathTestCase(SimpleTestCase):
     def setUp(self):
-        self.path = normalise_path(
-            "/Hello/world.html;fizz=three;buzz=five?foo=Bar&Baz=quux2"
-        )
+        self.path = normalise_path("/Hello/world.html?foo=Bar&Baz=quux2")
 
     def test_valid_path_noop(self):
         self.assertEqual(normalise_path(self.path), self.path)
 
     def test_path_normalisation(self):
         self.assertEqual(
-            normalise_path(  # The exact same URL
-                "/Hello/world.html;fizz=three;buzz=five?foo=Bar&Baz=quux2"
-            ),
+            normalise_path("/Hello/world.html?foo=Bar&Baz=quux2"),  # The exact same URL
             self.path,
         )
         self.assertEqual(
             normalise_path(  # Scheme, hostname and port ignored
-                "http://mywebsite.com:8000/Hello/world.html;fizz=three;buzz=five?foo=Bar&Baz=quux2"
+                "http://mywebsite.com:8000/Hello/world.html?foo=Bar&Baz=quux2"
             ),
             self.path,
         )
         self.assertEqual(
             normalise_path(  # Leading slash can be omitted
-                "Hello/world.html;fizz=three;buzz=five?foo=Bar&Baz=quux2"
+                "Hello/world.html?foo=Bar&Baz=quux2"
             ),
             self.path,
         )
         self.assertEqual(
             normalise_path(  # Trailing slashes are ignored
-                "Hello/world.html/;fizz=three;buzz=five?foo=Bar&Baz=quux2"
+                "Hello/world.html/?foo=Bar&Baz=quux2"
             ),
             self.path,
         )
         self.assertEqual(
             normalise_path(  # Fragments are ignored
-                "/Hello/world.html;fizz=three;buzz=five?foo=Bar&Baz=quux2#cool"
+                "/Hello/world.html?foo=Bar&Baz=quux2#cool"
             ),
             self.path,
         )
         self.assertEqual(
             normalise_path(  # Order of query string parameters is ignored
-                "/Hello/world.html;fizz=three;buzz=five?Baz=quux2&foo=Bar"
-            ),
-            self.path,
-        )
-        self.assertEqual(
-            normalise_path(  # Order of parameters is ignored
-                "/Hello/world.html;buzz=five;fizz=three?foo=Bar&Baz=quux2"
+                "/Hello/world.html?Baz=quux2&foo=Bar"
             ),
             self.path,
         )
         self.assertEqual(
             normalise_path(  # Leading whitespace
-                "  /Hello/world.html;fizz=three;buzz=five?foo=Bar&Baz=quux2"
+                "  /Hello/world.html?foo=Bar&Baz=quux2"
             ),
             self.path,
         )
         self.assertEqual(
             normalise_path(  # Trailing whitespace
-                "/Hello/world.html;fizz=three;buzz=five?foo=Bar&Baz=quux2  "
+                "/Hello/world.html?foo=Bar&Baz=quux2  "
             ),
             self.path,
         )
@@ -202,53 +192,35 @@ class NormalisePathTestCase(SimpleTestCase):
     def test_normalise_different_paths(self):
         self.assertNotEqual(
             normalise_path(  # 'hello' is lowercase
-                "/hello/world.html;fizz=three;buzz=five?foo=Bar&Baz=quux2"
+                "/hello/world.html?foo=Bar&Baz=quux2"
             ),
             self.path,
         )
         self.assertNotEqual(
-            normalise_path(  # No '.html'
-                "/Hello/world;fizz=three;buzz=five?foo=Bar&Baz=quux2"
-            ),
+            normalise_path("/Hello/world?foo=Bar&Baz=quux2"),  # No '.html'
             self.path,
         )
         self.assertNotEqual(
             normalise_path(  # Query string parameter value has wrong case
-                "/Hello/world.html;fizz=three;buzz=five?foo=bar&Baz=Quux2"
+                "/Hello/world.html?foo=bar&Baz=Quux2"
             ),
             self.path,
         )
         self.assertNotEqual(
             normalise_path(  # Query string parameter name has wrong case
-                "/Hello/world.html;fizz=three;buzz=five?foo=Bar&baz=quux2"
+                "/Hello/world.html?foo=Bar&baz=quux2"
             ),
-            self.path,
-        )
-        self.assertNotEqual(
-            normalise_path(  # Parameter value has wrong case
-                "/Hello/world.html;fizz=three;buzz=Five?foo=Bar&Baz=quux2"
-            ),
-            self.path,
-        )
-        self.assertNotEqual(
-            normalise_path(  # Parameter name has wrong case
-                "/Hello/world.html;Fizz=three;buzz=five?foo=Bar&Baz=quux2"
-            ),
-            self.path,
-        )
-        self.assertNotEqual(
-            normalise_path("/Hello/world.html?foo=Bar&Baz=quux2"),  # Missing params
             self.path,
         )
         self.assertNotEqual(
             normalise_path(  # 'WORLD' is uppercase
-                "/Hello/WORLD.html;fizz=three;buzz=five?foo=Bar&Baz=quux2"
+                "/Hello/WORLD.html?foo=Bar&Baz=quux2"
             ),
             self.path,
         )
         self.assertNotEqual(
             normalise_path(  # '.htm' is not the same as '.html'
-                "/Hello/world.htm;fizz=three;buzz=five?foo=Bar&Baz=quux2"
+                "/Hello/world.htm?foo=Bar&Baz=quux2"
             ),
             self.path,
         )

@@ -2,7 +2,7 @@ import csv
 import json
 from pathlib import Path
 from typing import NamedTuple
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -39,28 +39,20 @@ def normalise_path(url):
     url = url.strip()
 
     # Parse url
-    url_parsed = urlparse(url)
+    url_parsed = urlsplit(url)
 
     # Path must start with / but not end with /
-    path = url_parsed[2]
+    path = url_parsed.path
     if not path.startswith("/"):
         path = "/" + path
 
     if path.endswith("/") and len(path) > 1:
         path = path[:-1]
 
-    # Parameters must be sorted alphabetically
-    parameters = url_parsed[3]
-    parameters_components = parameters.split(";")
-    parameters = ";".join(sorted(parameters_components))
-
     # Query string components must be sorted alphabetically
-    query_string = url_parsed[4]
+    query_string = url_parsed.query
     query_string_components = query_string.split("&")
     query_string = "&".join(sorted(query_string_components))
-
-    if parameters:
-        path = path + ";" + parameters
 
     # Add query string to path
     if query_string:
@@ -97,7 +89,7 @@ def get_redirects():
                     if source.startswith("/"):
                         source = normalise_path(source)
                     else:
-                        parsed_source = urlparse(source)
+                        parsed_source = urlsplit(source)
                         source = parsed_source.hostname + normalise_path(source)
 
                     yield Redirect(source, row[1], is_permanent)
@@ -108,7 +100,7 @@ def get_redirects():
                     if source.startswith("/"):
                         source = entry.get("hostname", "") + normalise_path(source)
                     else:
-                        parsed_source = urlparse(source)
+                        parsed_source = urlsplit(source)
                         source = parsed_source.hostname + normalise_path(source)
 
                     yield Redirect(
