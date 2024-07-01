@@ -79,32 +79,26 @@ def get_redirects():
     for file in get_redirect_files():
         with file.open(mode="r") as f:
             if file.suffix == ".csv":
-                for row in csv.reader(f):
-                    try:
-                        is_permanent = str_to_bool(row[2])
-                    except IndexError:
-                        is_permanent = False
-
-                    source = row[0]
-                    if source.startswith("/"):
-                        source = normalise_path(source)
-                    else:
-                        parsed_source = urlsplit(source)
-                        source = parsed_source.hostname + normalise_path(source)
-
-                    yield Redirect(source, row[1], is_permanent)
-
+                data = csv.DictReader(f)
             elif file.suffix == ".json":
-                for entry in json.load(f):
-                    source = entry["source"]
-                    if source.startswith("/"):
-                        source = entry.get("hostname", "") + normalise_path(source)
-                    else:
-                        parsed_source = urlsplit(source)
-                        source = parsed_source.hostname + normalise_path(source)
+                data = json.load(f)
+            else:
+                raise ValueError(f"Unknown file {file}.")
 
-                    yield Redirect(
-                        source,
-                        entry["destination"],
-                        entry.get("is_permanent", False),
-                    )
+            for entry in data:
+                source = entry["source"]
+
+                permanent = entry.get("permanent", False)
+                if isinstance(permanent, str):
+                    permanent = str_to_bool(permanent)
+
+                if source.startswith("/"):
+                    source = (entry.get("host") or "") + normalise_path(source)
+                else:
+                    source = normalise_path(source)
+
+                yield Redirect(
+                    source,
+                    entry["destination"],
+                    permanent,
+                )

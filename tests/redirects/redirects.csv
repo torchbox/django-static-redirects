@@ -1,4 +1,5 @@
+source,destination,permanent,host
 /foo,/bar
 /foo?bar=baz,/barbaz
 /foo-permanent,/bar,true
-https://example.com/foobar,/barfoo
+/foobar,/barfoo,false,example.com

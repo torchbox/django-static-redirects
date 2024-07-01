@@ -43,36 +43,12 @@ class RedirectsMiddlewareTestCase(SimpleTestCase):
         response = self.client.get("/example-only")
         self.assertEqual(response.status_code, 404)
 
-    def test_qualified_redirect_with_wrong_hostname_from_json(self):
-        response = self.client.get("/example-only-qualified")
-        self.assertEqual(response.status_code, 404)
-
     def test_redirect_with_hostname_and_query_from_json(self):
         response = self.client.get(
             "/example-only?something=else", HTTP_HOST="example.com"
         )
         self.assertRedirects(
             response, "/example-dest", status_code=301, fetch_redirect_response=False
-        )
-
-    def test_qualified_redirect_with_hostname_from_json(self):
-        response = self.client.get("/example-only-qualified", HTTP_HOST="example.com")
-        self.assertRedirects(
-            response,
-            "/example-qualified-dest",
-            status_code=301,
-            fetch_redirect_response=False,
-        )
-
-    def test_qualified_redirect_with_hostname_and_query_from_json(self):
-        response = self.client.get(
-            "/example-only-qualified?something=else", HTTP_HOST="example.com"
-        )
-        self.assertRedirects(
-            response,
-            "/example-qualified-dest",
-            status_code=301,
-            fetch_redirect_response=False,
         )
 
     def test_redirect_with_hostname(self):

@@ -34,26 +34,23 @@ Redirect files are read in-order, with latter redirects taking precedence.
 
 Redirects can either be just paths, in which case they match all hostnames, or include a hostname. Schemes are not included as part of the match. If a request contains a querystring, it is ignored, unless a match containing the querystring is found.
 
-### CSV files
+### Redirect files
 
-CSV files must contain 2 or 3 columns, without a header. The first column is the source path, second is the destination URL, and the (optional) third notes whether the redirect is permanent.
+Redirect files must contain a "source", a "destination", a "permanent" (optional) and a "host" (optional). "source" is the source path, "destination" is the destination URL, "permanent" whether the redirect is permanent (defaults to `false`), and "host" allows constraining which host the redirect applies to.
 
 ```csv
+source,destination,permanent,host
 /source,/destination,true
 /source2,/destination2
-https://example.com/source3,/destination3
+/source3,/destination3,false,example.com
 ```
-
-### JSON files
-
-JSON files must contain a list of objects:
 
 ```json
 [
     {
         "source": "/source",
         "destination": "/destination",
-        "is_permanent": true
+        "permanent": true
     },
     {
         "source": "/source2",
@@ -62,13 +59,10 @@ JSON files must contain a list of objects:
     {
         "source": "/source3",
         "destination": "/destination3",
-        "hostname": "example.com"
+        "host": "example.com"
     },
-    {
-        "source": "https://example.com/source4",
-        "destination": "/destination4",
-    }
+
 ]
 ```
 
-Much like CSV, `is_permanent` is optional, defaulting to `false`.
+For CSV files, the columns may be in any order, however the column names are case-sensitive.
