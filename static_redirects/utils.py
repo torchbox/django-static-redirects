@@ -79,26 +79,26 @@ def get_redirects():
     for file in get_redirect_files():
         with file.open(mode="r") as f:
             if file.suffix == ".csv":
-                data = csv.DictReader(f)
+                data = list(csv.DictReader(f))
             elif file.suffix == ".json":
                 data = json.load(f)
             else:
                 raise ValueError(f"Unknown file {file}.")
 
-            for entry in data:
-                source = entry["source"]
+        for entry in data:
+            source = entry["source"]
 
-                permanent = entry.get("permanent", False)
-                if isinstance(permanent, str):
-                    permanent = str_to_bool(permanent)
+            permanent = entry.get("permanent", False)
+            if isinstance(permanent, str):
+                permanent = str_to_bool(permanent)
 
-                if source.startswith("/"):
-                    source = (entry.get("host") or "") + normalise_path(source)
-                else:
-                    source = normalise_path(source)
+            if source.startswith("/"):
+                source = (entry.get("host") or "") + normalise_path(source)
+            else:
+                source = normalise_path(source)
 
-                yield Redirect(
-                    source,
-                    entry["destination"],
-                    permanent,
-                )
+            yield Redirect(
+                source,
+                entry["destination"],
+                permanent,
+            )
