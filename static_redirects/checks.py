@@ -1,12 +1,12 @@
 from collections import Counter
 
-from django.core.checks import Warning, register
+from django.core import checks
 from django.utils.text import get_text_list
 
 from .utils import get_redirects
 
 
-@register("files")
+@checks.register("files")
 def duplicate_redirects_check(app_configs, **kwargs):
     redirect_sources = []
 
@@ -16,7 +16,7 @@ def duplicate_redirects_check(app_configs, **kwargs):
     duplicate_sources = [k for k, v in Counter(redirect_sources).items() if v > 1]
 
     if duplicate_sources:
-        yield Warning(
+        yield checks.Warning(
             "Static redirect sources must be unique",
             hint="Some redirect sources are duplicated: "
             + get_text_list(sorted(duplicate_sources)),
